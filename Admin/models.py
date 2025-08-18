@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from django.conf import settings
 from django.db import models
 
@@ -87,3 +88,96 @@ class ImageUpload(models.Model):
 
     def __str__(self):
         return self.title or f"Image {self.id}"
+
+
+#-----------------------------------------------------------
+
+class YoutubeVideo(models.Model):
+    CATEGORY_CHOICES = [
+        ("Education", "Education"),
+        ("Entertainment", "Entertainment"),
+        ("Music", "Music"),
+        ("Sports", "Sports"),
+        ("Technology", "Technology"),
+        ("Lifestyle", "Lifestyle"),
+    ]
+
+    video_url = models.URLField(max_length=500)
+    video_name = models.CharField(max_length=200)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+
+    def __str__(self):
+        return self.video_name
+
+
+# ------------------ Subscriptions -------------------
+
+
+# from django.db import models
+# from django.utils import timezone
+# from datetime import timedelta
+
+# class Subscription(models.Model):
+#     PLAN_CHOICES = [
+#         ('monthly', 'Monthly'),
+#         ('yearly', 'Yearly'),
+#     ]
+
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
+#     start_date = models.DateField(auto_now_add=True)
+#     end_date = models.DateField(blank=True, null=True)
+#     is_active = models.BooleanField(default=False)
+
+#     def save(self, *args, **kwargs):
+#     # ensure start_date is set
+#         if not self.start_date:
+#             self.start_date = timezone.now().date()
+
+#     # Auto-set end_date based on selected plan
+#         if not self.end_date:
+#             if self.plan == 'monthly':
+#                 self.end_date = self.start_date + timedelta(days=30)
+#             elif self.plan == 'yearly':
+#                 self.end_date = self.start_date + timedelta(days=365)
+
+#             super().save(*args, **kwargs)
+
+
+#     def __str__(self):
+#         return f"{self.user.username} - {self.plan}"
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from django.conf import settings
+
+class Subscription(models.Model):
+    PLAN_CHOICES = [
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.start_date:
+            self.start_date = timezone.now().date()
+
+        if not self.end_date:
+            if self.plan == 'monthly':
+                self.end_date = self.start_date + timedelta(days=30)
+            elif self.plan == 'yearly':
+                self.end_date = self.start_date + timedelta(days=365)
+
+        super().save(*args, **kwargs)
+
+    @property
+    def is_active(self):
+        """Dynamically check if subscription is valid."""
+        return self.end_date >= timezone.now().date()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.plan}"

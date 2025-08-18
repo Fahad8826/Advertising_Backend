@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from .models import Category, SubCategory, ImageUpload, Subscription, YoutubeVideo
 
 User = get_user_model()
 
@@ -76,8 +79,6 @@ class LoginSerializer(serializers.Serializer):
 
 #---------------------------------------------------
 
-from rest_framework import serializers
-from .models import Category, SubCategory, ImageUpload
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,3 +100,22 @@ class ImageUploadSerializer(serializers.ModelSerializer):
         model = ImageUpload
         fields = '__all__'
         
+#---------------------------------------------------
+class YoutubeVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YoutubeVideo
+        fields = "__all__"
+
+
+# class SubscriptionSerializer(serializers.ModelSerializer):
+#     user = serializers.StringRelatedField(read_only=True)  # show username
+#     user_id = serializers.PrimaryKeyRelatedField(
+#         queryset=Subscription._meta.get_field("user").related_model.objects.all(),
+#         source="user",
+#         write_only=True
+#     )
+
+#     class Meta:
+#         model = Subscription
+#         fields = ['id', 'user', 'user_id', 'plan', 'start_date', 'end_date', 'is_active']
+#         read_only_fields = ['start_date', 'end_date', 'is_active']

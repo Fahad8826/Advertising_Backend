@@ -1,8 +1,9 @@
 from django.shortcuts import render
 
+
 # Create your views here.
-from .models import Category, SubCategory, ImageUpload
-from .serializers import CategorySerializer, EditUserSerializer, SubCategorySerializer, ImageUploadSerializer
+from .models import Category, SubCategory, ImageUpload, YoutubeVideo
+from .serializers import CategorySerializer, EditUserSerializer, SubCategorySerializer, ImageUploadSerializer, YoutubeVideoSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
@@ -72,6 +73,7 @@ class SubCategoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
 
 
 #-----------------------------------------------------------------------
+
 class ImageUploadView(generics.ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = ImageUpload.objects.all()
@@ -96,3 +98,44 @@ class ImageUploadDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+
+#-----------------------------------------------------------------------
+
+
+class YoutubeVideoListCreateView(generics.ListCreateAPIView):
+    queryset = YoutubeVideo.objects.all()
+    serializer_class = YoutubeVideoSerializer
+
+
+# Retrieve, update, or delete a single video
+class YoutubeVideoDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = YoutubeVideo.objects.all()
+    serializer_class = YoutubeVideoSerializer
+
+
+
+
+from rest_framework import generics, permissions
+from .models import Subscription
+from .serializers import SubscriptionSerializer
+
+class SubscriptionListCreateView(generics.ListCreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # ensure subscription is linked to the authenticated user
+        serializer.save(user=self.request.user)
+
+
+class SubscriptionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # only allow user to see their own subscription
+        return Subscription.objects.filter(user=self.request.user)

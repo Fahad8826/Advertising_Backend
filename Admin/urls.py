@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoryRetrieveUpdateDestroyView, EditUserByIdView,RegisterView, LoginView, SubCategoryRetrieveUpdateDestroyView,UserList
+from .views import CategoryRetrieveUpdateDestroyView, EditUserByIdView,RegisterView, LoginView, SubCategoryRetrieveUpdateDestroyView, SubscriptionDetailView, SubscriptionListCreateView,UserList, YoutubeVideoDetailView, YoutubeVideoListCreateView
 
 from .views import CategoryListCreateView, SubCategoryListCreateView, ImageUploadView,ImageUploadDeleteView
 
@@ -19,4 +19,15 @@ urlpatterns = [
 
     path('images/', ImageUploadView.as_view(), name='image-upload'),
     path('images/<int:pk>/', ImageUploadDeleteView.as_view(), name='image-delete'),
+
+    path('videos/', YoutubeVideoListCreateView.as_view(), name='video-list-create'),
+    path('videos/<int:pk>/', YoutubeVideoDetailView.as_view(), name='video-detail'),
+
+    # path('subscriptions/', SubscriptionListView.as_view(), name='subscription-list'),
+    # path('subscriptions/create/', SubscriptionCreateView.as_view(), name='subscription-create'),
+    # path('subscriptions/<int:pk>/', SubscriptionDetailView.as_view(), name='subscription-detail'),
+
+    path('subscriptions/', SubscriptionListCreateView.as_view(), name='subscription-list-create'),
+    path('subscriptions/<int:pk>/', SubscriptionDetailView.as_view(), name='subscription-detail'),
+
 ]
