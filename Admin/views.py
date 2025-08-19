@@ -128,7 +128,10 @@ class SubscriptionListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         # ensure subscription is linked to the authenticated user
-        serializer.save(user=self.request.user)
+        # serializer.save(user=self.request.user)
+        subscription = serializer.save(user=self.request.user)
+        subscription.save()  # triggers model save logic to set end_date & is_active
+
 
 
 class SubscriptionDetailView(generics.RetrieveUpdateDestroyAPIView):

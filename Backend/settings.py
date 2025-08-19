@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -137,6 +138,10 @@ REST_FRAMEWORK = {
      'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ]
+}
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365),   # 1 year
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=366),  # slightly longer
 }
 
 AUTH_USER_MODEL = 'Admin.CustomUser'
