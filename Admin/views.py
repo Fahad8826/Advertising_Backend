@@ -133,12 +133,14 @@ class SubscriptionListCreateView(generics.ListCreateAPIView):
         subscription.save()  # triggers model save logic to set end_date & is_active
 
 
-
 class SubscriptionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # only allow user to see their own subscription
-        return Subscription.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_staff:  
+            # staff/admin can update any subscription
+            return Subscription.objects.all()
+        return Subscription.objects.filter(user=user)

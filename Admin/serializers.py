@@ -124,6 +124,24 @@ class YoutubeVideoSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 from .models import Subscription
 
+# class SubscriptionSerializer(serializers.ModelSerializer):
+#     user = serializers.StringRelatedField(read_only=True)  # show username
+#     user_id = serializers.PrimaryKeyRelatedField(
+#         queryset=Subscription._meta.get_field("user").related_model.objects.all(),
+#         source="user",
+#         write_only=True
+#     )
+
+#     # Add is_active as a computed field
+#     is_active = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Subscription
+#         fields = ['id', 'user', 'user_id', 'plan', 'start_date', 'end_date', 'is_active','revoke']
+#         read_only_fields = ['start_date','is_active']
+
+#     def get_is_active(self, obj):
+#         return obj.is_active  # uses the @property in the model
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)  # show username
     user_id = serializers.PrimaryKeyRelatedField(
@@ -132,13 +150,41 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-    # Add is_active as a computed field
     is_active = serializers.SerializerMethodField()
 
     class Meta:
         model = Subscription
-        fields = ['id', 'user', 'user_id', 'plan', 'start_date', 'end_date', 'is_active']
-        read_only_fields = ['start_date', 'end_date', 'is_active']
+        fields = ['id', 'user', 'user_id', 'plan', 'start_date', 'end_date', 'is_active', 'revoke']
+        read_only_fields = ['start_date', 'is_active']
 
     def get_is_active(self, obj):
-        return obj.is_active  # uses the @property in the model
+        return obj.is_active
+
+    def validate(self, data):
+        revoke = data.get('revoke', False)
+
+        # If revoking, ignore plan
+        if revoke:
+            data['plan'] = None
+        else:
+            if not data.get('plan') and not self.instance:
+                raise serializers.ValidationError(
+                    {"plan": "Plan is required unless subscription is revoked."}
+                )
+        return data
+
+    def update(self, instance, validated_data):
+        # If revoke is True, wipe out plan + dates
+        if validated_data.get('revoke') is True:
+            instance.plan = None
+            instance.start_date = None
+            instance.end_date = None
+        else:
+            # Otherwise normal update
+            instance.plan = validated_data.get('plan', instance.plan)
+            instance.start_date = validated_data.get('start_date', instance.start_date)
+            instance.end_date = validated_data.get('end_date', instance.end_date)
+
+        instance.revoke = validated_data.get('revoke', instance.revoke)
+        instance.save()
+        return instance

@@ -112,40 +112,6 @@ class YoutubeVideo(models.Model):
 
 # ------------------ Subscriptions -------------------
 
-
-# from django.db import models
-# from django.utils import timezone
-# from datetime import timedelta
-
-# class Subscription(models.Model):
-#     PLAN_CHOICES = [
-#         ('monthly', 'Monthly'),
-#         ('yearly', 'Yearly'),
-#     ]
-
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
-#     start_date = models.DateField(auto_now_add=True)
-#     end_date = models.DateField(blank=True, null=True)
-#     is_active = models.BooleanField(default=False)
-
-#     def save(self, *args, **kwargs):
-#     # ensure start_date is set
-#         if not self.start_date:
-#             self.start_date = timezone.now().date()
-
-#     # Auto-set end_date based on selected plan
-#         if not self.end_date:
-#             if self.plan == 'monthly':
-#                 self.end_date = self.start_date + timedelta(days=30)
-#             elif self.plan == 'yearly':
-#                 self.end_date = self.start_date + timedelta(days=365)
-
-#             super().save(*args, **kwargs)
-
-
-#     def __str__(self):
-#         return f"{self.user.username} - {self.plan}"
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
@@ -158,11 +124,15 @@ class Subscription(models.Model):
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES,null=True, blank=True)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(blank=True, null=True)
+    revoke=models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        if self.revoke:
+            self.plan = None
+
         if not self.start_date:
             self.start_date = timezone.now().date()
 
