@@ -123,7 +123,7 @@ class Subscription(models.Model):
         ('yearly', 'Yearly'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscriptions')
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES,null=True, blank=True)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(blank=True, null=True)
@@ -147,6 +147,8 @@ class Subscription(models.Model):
     @property
     def is_active(self):
         """Dynamically check if subscription is valid."""
+        if not self.end_date or not self.plan or self.revoke:
+            return False
         return self.end_date >= timezone.now().date()
 
     def __str__(self):
