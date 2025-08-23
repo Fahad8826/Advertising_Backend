@@ -2,12 +2,13 @@ from django.shortcuts import render
 
 
 # Create your views here.
-from .models import Category, SubCategory, ImageUpload, YoutubeVideo
-from .serializers import CategorySerializer, EditUserSerializer, SubCategorySerializer, ImageUploadSerializer, YoutubeVideoSerializer
+from .models import Category, SubCategory, ImageUpload, YoutubeVideo, Carousel
+from .serializers import CategorySerializer, EditUserSerializer, SubCategorySerializer, ImageUploadSerializer, \
+    YoutubeVideoSerializer, CarouselSerializer
 from rest_framework.parsers import MultiPartParser, FormParser,JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework import generics,status,permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.views import APIView
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from rest_framework.permissions import AllowAny,IsAuthenticated
@@ -142,3 +143,22 @@ class SubscriptionDetailView(generics.RetrieveUpdateDestroyAPIView):
             # staff/admin can update any subscription
             return Subscription.objects.all()
         return Subscription.objects.filter(user=user)
+
+
+
+
+# class CarouselViewSet(viewsets.ModelViewSet):
+#     queryset = Carousel.objects.all()
+#     serializer_class = CarouselSerializer
+#     parser_classes = [MultiPartParser, FormParser]
+
+class CarouselListCreateView(generics.ListCreateAPIView):
+    queryset = Carousel.objects.all()
+    serializer_class = CarouselSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+# Retrieve, update, or delete a single carousel entry
+class CarouselDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Carousel.objects.all()
+    serializer_class = CarouselSerializer
+    parser_classes = [MultiPartParser, FormParser]

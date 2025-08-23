@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import CategoryRetrieveUpdateDestroyView, EditUserByIdView,RegisterView, LoginView, SubCategoryRetrieveUpdateDestroyView, SubscriptionDetailView, SubscriptionListCreateView,UserList, YoutubeVideoDetailView, YoutubeVideoListCreateView
+from .views import CategoryRetrieveUpdateDestroyView, EditUserByIdView, RegisterView, LoginView, \
+    SubCategoryRetrieveUpdateDestroyView, SubscriptionDetailView, SubscriptionListCreateView, UserList, \
+    YoutubeVideoDetailView, YoutubeVideoListCreateView, CarouselListCreateView, CarouselDetailView
 
 from .views import CategoryListCreateView, SubCategoryListCreateView, ImageUploadView,ImageUploadDeleteView
 
@@ -23,10 +25,8 @@ urlpatterns = [
     path('videos/', YoutubeVideoListCreateView.as_view(), name='video-list-create'),
     path('videos/<int:pk>/', YoutubeVideoDetailView.as_view(), name='video-detail'),
 
-    # path('subscriptions/', SubscriptionListView.as_view(), name='subscription-list'),
-    # path('subscriptions/create/', SubscriptionCreateView.as_view(), name='subscription-create'),
-    # path('subscriptions/<int:pk>/', SubscriptionDetailView.as_view(), name='subscription-detail'),
-
+    path('carousels/', CarouselListCreateView.as_view(), name='carousel-list-create'),
+    path('carousels/<int:pk>/', CarouselDetailView.as_view(), name='carousel-detail'),
     path('subscriptions/', SubscriptionListCreateView.as_view(), name='subscription-list-create'),
     path('subscriptions/<int:pk>/', SubscriptionDetailView.as_view(), name='subscription-detail'),
 

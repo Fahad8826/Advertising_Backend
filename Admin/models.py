@@ -1,11 +1,6 @@
 from datetime import date, timedelta
 from django.conf import settings
-from django.db import models
 
-# Create your models here.
-
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.db import models
 
 
 from django.db import models
@@ -18,6 +13,9 @@ def user_profile_image_path(instance, filename):
 def user_logo_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_logos/<username>/<filename>
     return f'user_logos/{instance.username}/{filename}'
+
+def carousel_image_path(instance, filename):
+    return f"carousel/{filename}"
 
 
 class CustomUserManager(BaseUserManager):
@@ -153,3 +151,34 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.plan}"
+
+
+
+# ------------------------------------------------------
+
+class Carousel(models.Model):
+    image1 = models.ImageField(upload_to=carousel_image_path, blank=True, null=True)
+    image2 = models.ImageField(upload_to=carousel_image_path, blank=True, null=True)
+    image3 = models.ImageField(upload_to=carousel_image_path, blank=True, null=True)
+    image4 = models.ImageField(upload_to=carousel_image_path, blank=True, null=True)
+
+    def add_image(self, new_image):
+
+        if not self.image1:
+            self.image1 = new_image
+        elif not self.image2:
+            self.image2 = new_image
+        elif not self.image3:
+            self.image3 = new_image
+        elif not self.image4:
+            self.image4 = new_image
+        else:
+            # shift images: drop oldest (image1) and move others left
+            self.image1.delete(save=False)  # delete old file
+            self.image1, self.image2, self.image3 = self.image2, self.image3, self.image4
+            self.image4 = new_image
+        self.save()
+
+    def __str__(self):
+        return "Carousel"
+
